@@ -2,14 +2,14 @@ from fivesim import FiveSim
 import time
 
 # These example values won't work. You must get your own api_key
-API_KEY = "yourkey"
+API_KEY = "yourkeyhere"
 
 client = FiveSim(API_KEY)  # Optional proxy
 
 # Balance request
 balance_info = client.get_balance()  # Provides profile data: email, balance and rating.
 balance = balance_info["balance"]
-print("Your Balance : " + balance + " RUB")
+print("Your Balance : " + str(balance) + " RUB")
 
 
 # # Prices by country and product
@@ -19,10 +19,16 @@ print("Your Balance : " + balance + " RUB")
 # print(regPrice)
 
 
-# Buy activation number
-buyNumber = client.buy_number(
-    country="russia", operator="virtual52", product="google"
-)  # Buy new activation number
+try:
+    # Try to buy a number in Russia
+    buyNumber = client.buy_number(
+        country="russia", operator="virtual52", product="google"
+    )
+except Exception:
+    # If that fails, try to buy a number in Kyrgyzstan
+    buyNumber = client.buy_number(
+        country="kyrgyzstan", operator="virtual51", product="google"
+    )
 # Extract id, phone and product
 id = buyNumber["id"]
 phone = buyNumber["phone"]
@@ -43,7 +49,7 @@ while True:
     if sms:  # If sms is not null or empty, break the loop
         break
     elif time.time() - start_time > 60:  # If 60 seconds have passed
-        print("OTP not received yet. Do you want to reset the time? (y/n)")
+        print("OTP not received yet. Do you want still waiting? (y/n)")
         user_input = input("choose an option(y/n) : ")
         if user_input.lower() == "y":
             start_time = time.time()  # Reset the time
